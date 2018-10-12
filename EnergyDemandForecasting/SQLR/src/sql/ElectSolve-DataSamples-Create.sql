@@ -1,58 +1,36 @@
 use mdm
 
+-- Collect some data to insert into DemandReal Table
 SELECT 
-'INSERT INTO DemandReal (utcTimestamp, region, Load) VALUES ("' + CONVERT(varchar, DATEADD(hh, DATEDIFF(hh, GETDATE(), GETUTCDATE()), d.ReadDate)) + '", ' +h.MeterIdentifier + ', ' + convert(varchar, d.ReadValue) + ')'
+'INSERT INTO DemandReal (utcTimestamp, region, Load) VALUES 
+(''' + CONVERT(varchar, DATEADD(hh, DATEDIFF(hh, GETDATE(), GETUTCDATE()), d.ReadDate)) + ''', ' 
++ '''' + h.MeterIdentifier+ '-ACCOUNT-ENTITY-' + h.UOM + ''', ' 
++ convert(varchar, d.ReadValue) + ')'
 FROM mdm.dbo.MeterReadIntervalHeader h
 inner join mdm.dbo.MeterReadIntervalDetail d 
 on h.MeterReadIntervalHeaderId = d.MeterReadIntervalHeaderId
-WHERE h.UOM = 'kWh' and h.ReadLogDate > '2018-06-01' 
+--TODO, just make this one year data range from CurrentDay - 366
+WHERE h.UOM = 'kWh' and h.ReadLogDate > GETDATE()-366
 AND h.MeterIdentifier IN
 ('57741868'
 ,'56689480'
 ,'56679397'
 ,'61263517'
 ,'58512668'
-,'61263654')
-
-
--- temperature data
-SELECT 
-'INSERT INTO TemperatureReal (utcTimestamp, region, Temperature) VALUES ("' + CONVERT(varchar, DATEADD(hh, DATEDIFF(hh, GETDATE(), GETUTCDATE()), t.TempDate)) + '", ' 
-+ '57741868' + ', ' + convert(varchar, t.TemperatureF) + ')'
-FROM mdm.dbo.Temperature t
-union
-SELECT 
-'INSERT INTO TemperatureReal (utcTimestamp, region, Temperature) VALUES ("' + CONVERT(varchar, DATEADD(hh, DATEDIFF(hh, GETDATE(), GETUTCDATE()), t.TempDate)) + '", ' 
-+ '56689480' + ', ' + convert(varchar, t.TemperatureF) + ')'
-FROM mdm.dbo.Temperature t
-union
-SELECT 
-'INSERT INTO TemperatureReal (utcTimestamp, region, Temperature) VALUES ("' + CONVERT(varchar, DATEADD(hh, DATEDIFF(hh, GETDATE(), GETUTCDATE()), t.TempDate)) + '", ' 
-+ '56679397' + ', ' + convert(varchar, t.TemperatureF) + ')'
-FROM mdm.dbo.Temperature t
-union
-SELECT 
-'INSERT INTO TemperatureReal (utcTimestamp, region, Temperature) VALUES ("' + CONVERT(varchar, DATEADD(hh, DATEDIFF(hh, GETDATE(), GETUTCDATE()), t.TempDate)) + '", ' 
-+ '61263517' + ', ' + convert(varchar, t.TemperatureF) + ')'
-FROM mdm.dbo.Temperature t
-union  
-SELECT 
-'INSERT INTO TemperatureReal (utcTimestamp, region, Temperature) VALUES ("' + CONVERT(varchar, DATEADD(hh, DATEDIFF(hh, GETDATE(), GETUTCDATE()), t.TempDate)) + '", ' 
-+ '58512668' + ', ' + convert(varchar, t.TemperatureF) + ')'
-FROM mdm.dbo.Temperature t
-union
-
-SELECT DISTINCT
-'INSERT INTO TemperatureReal (utcTimestamp, region, Temperature, Flag) VALUES (''' + CONVERT(varchar, DATEADD(hh, DATEDIFF(hh, GETDATE(), GETUTCDATE()), t.TempDateTime)) + ''', ' 
-+ '61263654' + ', ' + convert(varchar, t.TemperatureF) + ', 1)'
-FROM mdm.dbo.Temperature t
-WHERE t.TempDate > '2017-06-01'
+,'61263654',
+'SystemLoad_Electric_VMD-ACCOUNT-ENTITY-kWh')
 
 SELECT 
-CONVERT(varchar, DATEADD(hh, DATEDIFF(hh, GETDATE(), GETUTCDATE()), t.TempDateTime)) 
---, t.TempDateTime
-,'61263654'
-,t.TemperatureF
-,1
-FROM mdm.dbo.Temperature t
-WHERE t.TempDate > '2017-06-01'
+'INSERT INTO DemandReal (utcTimestamp, region, Load) VALUES 
+(''' + CONVERT(varchar, DATEADD(hh, DATEDIFF(hh, GETDATE(), GETUTCDATE()), d.ReadDate)) + ''', ' 
++ '''' + h.MeterIdentifier+ '-ACCOUNT-ENTITY-' + h.UOM + ''', ' 
++ convert(varchar, d.ReadValue) + ')'
+FROM mdm.dbo.MeterReadIntervalHeader h
+inner join mdm.dbo.MeterReadIntervalDetail d 
+on h.MeterReadIntervalHeaderId = d.MeterReadIntervalHeaderId
+--TODO, just make this one year data range from CurrentDay - 366
+WHERE h.UOM = 'kWh' and h.ReadLogDate > GETDATE()-366
+AND h.MeterIdentifier IN
+('SystemLoad_Electric_VMD')
+
+
